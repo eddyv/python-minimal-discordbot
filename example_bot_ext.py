@@ -67,14 +67,21 @@ async def roll(ctx, number_of_dice: int, number_of_sides: int):
     await ctx.send(', '.join(dice))
 
 
-@bot.event
-async def on_error(event, *args, **kwargs):
-    with open('err.log', 'a') as f:
-        if event == 'on_message':
-            f.write(f'Unhandled message: {args[0]}\n')
-        else:
-            raise
+@bot.command(name='create-channel', help='Creates another channel named real-python. Requires admin role', pass_context=True)
+@commands.has_role('admin')
+async def create_channel(ctx, channel_name='real-python'):
+    guild = ctx.guild
+    existing_channel = discord.utils.get(guild.channels, name=channel_name)
+    if not existing_channel:
+        print(f'Creating a new channel: {channel_name}')
+        await guild.create_text_channel(channel_name)
 
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.errors.CheckFailure):
+        await ctx.send(error)
+        await ctx.send('You do not have the correct role for this command.')
 
 @bot.event
 async def on_member_join(member):
