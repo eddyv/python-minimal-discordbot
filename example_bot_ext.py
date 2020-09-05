@@ -33,8 +33,8 @@ async def on_message(message):
 
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
-    
-    #when using on_message it forbids any extra commands from running. using the below causes it to process commands
+
+    # when using on_message it forbids any extra commands from running. using the below causes it to process commands
     await bot.process_commands(message)
 
 
@@ -51,6 +51,20 @@ async def nine_nine(ctx):
 
     response = random.choice(brooklyn_99_quotes)
     await ctx.send(response)
+
+'''
+By Default, arguments to a Command function are strings. Therefore, we explicitly state that we expect the types to be int
+'''
+
+
+@bot.command(name='roll_dice', help='Simulates rolling dice.')
+async def roll(ctx, number_of_dice: int, number_of_sides: int):
+
+    dice = [
+        str(random.choice(range(1, number_of_sides + 1)))
+        for _ in range(number_of_dice)
+    ]
+    await ctx.send(', '.join(dice))
 
 
 @bot.event
