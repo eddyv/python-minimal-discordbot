@@ -4,12 +4,17 @@ import random
 from dotenv import load_dotenv
 from discord.ext import commands
 
+description = '''An example bot to showcase the discord.ext.commands extension
+module. There are a number of utility commands being showcased here.'''
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = os.getenv('PREFIX')
 
 bot = commands.Bot(command_prefix=PREFIX)
+
+initial_extensions = ['cogs.greetings']
 
 
 @bot.event
@@ -93,5 +98,32 @@ async def on_member_join(member):
         f'Hi {member.name}, welcome to my Discord server!'
     )
 
+
+@bot.command(name='load', help='Loads an extension')
+async def load(extension_name: str):
+    """Loads an extension."""
+    try:
+        print(f'Loading extension {extension_name}.')
+        bot.load_extension(extension_name)
+    except (AttributeError, ImportError) as e:
+        await bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+        return
+    await bot.say("{} loaded.".format(extension_name))
+
+
+@bot.command(name='unload', help='Unloads an extension')
+async def unload(extension_name: str):
+    """Unloads an extension."""
+    bot.unload_extension(extension_name)
+    await bot.say("{} unloaded.".format(extension_name))
+
+
+if __name__ == "__main__":
+    for extension in initial_extensions:
+        try:
+            print(f'Load extension {extension}.')
+            bot.load_extension(extension)
+        except Exception as e:
+            print(f'Failed to load extension {extension}.')
 
 bot.run(TOKEN)
